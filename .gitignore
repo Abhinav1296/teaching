@@ -1,0 +1,20 @@
+# Trainer repo — PRIVATE. Keep it lean; never commit build junk.
+
+# Node (from tools/decks when you run `npm install` to rebuild decks)
+node_modules/
+package-lock.json
+
+# QA render scratch (contact sheets, exported PNGs)
+tools/decks/qa/
+*.png
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+~$*
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
