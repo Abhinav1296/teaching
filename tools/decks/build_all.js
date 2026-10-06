@@ -76,7 +76,7 @@ const RNOTE = [
 ];
 
 function buildTitle(pres, d) {
-  L.titleSlide(pres, { kicker: `FoodCo Data Analytics Bootcamp · Day ${d.n}`, title: d.title, subtitle: d.sub, tags: d.tags, footer: `100% hands-on  ·  3-hour session  ·  ${d.module}` });
+  L.titleSlide(pres, { kicker: `FoodCo Data Analytics Bootcamp · Day ${d.n}`, title: d.title, subtitle: d.sub, tags: d.tags, footer: `100% hands-on  ·  ${d.sessionLen || "3-hour"} session  ·  ${d.module}` });
 }
 
 /* ================= DAY CONFIGS ================= */
@@ -85,19 +85,33 @@ const DAYS = [];
 /* ---- DAY 2 ---- */
 DAYS.push({
   n: 2, nn: "02", dir: "Day_02_Analytics_Types_and_Ethics", module: "Module 1 of 3",
+  sessionLen: "6-hour",
   title: "Analytics Types & Ethics", sub: "What kind of question is this — and should we even answer it?",
-  tags: ["Descriptive", "Predictive", "Prescriptive", "PII"],
+  tags: ["Descriptive", "Predictive", "Prescriptive", "PII", "DPDP"],
+  rhythm: [
+    { t: "25 min", l: "2 demos — 4 lenses + mask a phone", c: P.coral },
+    { t: "75 min", l: "Build A — tag & debate 15 Qs", c: P.orange },
+    { t: "70 min", l: "Build B — safe-to-share table", c: P.teal },
+    { t: "45 min", l: "Build C — 3 descriptive stats", c: P.gold },
+    { t: "45 min", l: "Ethics-desk role-play", c: P.navy },
+    { t: "30 min", l: "Show & tell + open your PR", c: P.coral },
+  ],
+  rhythmNote: [
+    { text: "Two 10-min breaks across the day. ", options: { color: P.slate } },
+    { text: "The demos are short on purpose", options: { bold: true, color: P.ink } },
+    { text: " — today you build it, twice.", options: { color: P.slate } },
+  ],
   scenario: {
-    title: "Ten questions, one data-ethics problem", eyebrow: "The business scenario",
+    title: "Fifteen questions, one data-ethics problem", eyebrow: "The business scenario",
     scenario: [
-      { text: "Leadership fires ten questions at the new team", options: { bold: true, color: P.ink } },
+      { text: "Leadership fires fifteen questions at the new team", options: { bold: true, color: P.ink } },
       { text: " — from “what was revenue in August?” to “what discount keeps each customer?”. Meanwhile Legal flags that the customer table is ", options: { color: P.slate } },
       { text: "full of personal data nobody has reviewed", options: { bold: true, color: P.coral } },
-      { text: ".", options: { color: P.slate } },
+      { text: " — and FoodCo answers to India’s DPDP Act.", options: { color: P.slate } },
     ],
-    files: [{ name: "business_questions.csv", deliverable: true }, { name: "customers_pii.csv" }, { name: "orders_sample.csv" }],
-    callout: [{ text: "Two jobs today:  ", options: { color: P.white } }, { text: "classify the questions, then audit the data.", options: { bold: true, color: P.gold } }],
-    notes: "Hook on the tension: the business wants answers, Legal wants safety. Both are your job now.",
+    files: [{ name: "business_questions.csv", deliverable: true }, { name: "customers_pii.csv" }, { name: "orders_sample.csv" }, { name: "→ safe_customers.csv", deliverable: true }],
+    callout: [{ text: "Two jobs today:  ", options: { color: P.white } }, { text: "classify the questions, then make the data safe to share.", options: { bold: true, color: P.gold } }],
+    notes: "Hook on the tension: the business wants answers, Legal wants safety. Both are your job now. 15 questions (10 core + 5 bonus) and a real masking build.",
   },
   concepts: [
     (pres) => {
@@ -117,53 +131,85 @@ DAYS.push({
       s.addNotes("Don't lecture the definitions — anchor each to a real FoodCo question. The jump from Descriptive to Predictive is the jump from a formula to a project.");
     },
     (pres) => {
-      const s = K.concept(pres, "Just because you can, should you?", "Data ethics");
-      L.card(s, { x: PAGE.m, y: 1.85, w: 5.0, h: 3.0, fill: P.coralLt, line: P.coral });
-      s.addText("PII in customers_pii.csv", { x: PAGE.m + 0.3, y: 2.05, w: 4.4, h: 0.4, isTextBox: true, margin: 0, fontFace: F.head, fontSize: 15, bold: true, color: P.coral, align: "left" });
-      ["name", "phone", "email", "address", "date_of_birth"].forEach((c, i) => {
-        chip(s, PAGE.m + 0.3 + (i % 3) * 1.5, 2.55 + Math.floor(i / 3) * 0.72, 1.4, 0.55, c, { fill: P.white, line: P.coral, mono: true, fs: 11, color: P.ink });
+      const s = K.concept(pres, "Mask before you share — your safe-to-share table", "Data ethics · Build B");
+      const cols = [
+        { x: PAGE.m, w: 2.5, h: "Column" },
+        { x: 3.25, w: 6.3, h: "Masking rule  (yesterday’s text functions)" },
+        { x: 9.75, w: 2.95, h: "Result" },
+      ];
+      const rowY = 1.95, rh = 0.66;
+      cols.forEach((c) => s.addText(c.h, { x: c.x, y: rowY, w: c.w, h: 0.4, isTextBox: true, margin: 0, fontFace: F.head, fontSize: 12, bold: true, color: P.teal, align: "left" }));
+      const rows = [
+        ["customer_id", "KEEP — it’s a pseudonym / your analysis key", "C0001", true],
+        ["customer_name", '=LEFT(B2,1)&". "&MID(B2,FIND(" ",B2)+1,1)&"."', "K. S.", false],
+        ["email", '=LEFT(C2,2)&"***@"&MID(C2,FIND("@",C2)+1,50)', "kr***@example.com", false],
+        ["phone", '="xxxxxx"&RIGHT(D2,4)', "xxxxxx2098", false],
+        ["date_of_birth", '=TEXT(E2,"yyyy")   — year only / age band', "1996", false],
+      ];
+      rows.forEach((r, i) => {
+        const y = rowY + 0.52 + i * rh;
+        if (i % 2 === 0) s.addShape("roundRect", { x: PAGE.m - 0.1, y: y - 0.03, w: PAGE.w - 2 * PAGE.m + 0.2, h: rh, rectRadius: 0.04, fill: { color: P.cloud }, line: { type: "none" } });
+        s.addText(r[0], { x: cols[0].x, y, w: cols[0].w, h: rh - 0.06, isTextBox: true, margin: 0, valign: "middle", fontFace: "Consolas", fontSize: 12, bold: true, color: r[3] ? P.teal : P.ink, align: "left" });
+        s.addText(r[1], { x: cols[1].x, y, w: cols[1].w, h: rh - 0.06, isTextBox: true, margin: 0, valign: "middle", fontFace: r[3] ? F.body : "Consolas", fontSize: r[3] ? 12 : 11, color: r[3] ? P.slate : P.ink, align: "left" });
+        s.addText(r[2], { x: cols[2].x, y, w: cols[2].w, h: rh - 0.06, isTextBox: true, margin: 0, valign: "middle", fontFace: "Consolas", fontSize: 12, bold: true, color: P.teal, align: "left" });
       });
-      K.arrow(s, 5.75, 6.75, 3.35, null, P.slate);
-      L.card(s, { x: 6.9, y: 1.85, w: 5.8, h: 3.0, fill: P.tealLt, line: P.teal });
-      s.addText("Mask before you share", { x: 7.2, y: 2.05, w: 5.2, h: 0.4, isTextBox: true, margin: 0, fontFace: F.head, fontSize: 15, bold: true, color: P.teal, align: "left" });
-      L.codeBox(s, { x: 7.2, y: 2.55, w: 5.2, h: 0.75, fs: 13, accent: "7FE3CF", lines: ['="xxxxx" & RIGHT(phone,4)'] });
       s.addText([
-        { text: "→  +91-xxxxx-4821.  ", options: { bold: true, color: P.ink } },
-        { text: "Show only what the question actually needs.", options: { color: P.slate } },
-      ], { x: 7.2, y: 3.5, w: 5.2, h: 1.1, isTextBox: true, margin: 0, valign: "top", fontFace: F.body, fontSize: 13.5, lineSpacingMultiple: 1.1, align: "left" });
+        { text: "city", options: { fontFace: "Consolas", color: P.ink, bold: true } },
+        { text: " stays readable but is a ", options: { color: P.slate } },
+        { text: "quasi-identifier", options: { bold: true, color: P.coral } },
+        { text: " — city + date of birth can re-identify someone with no name attached.", options: { color: P.slate } },
+      ], { x: PAGE.m, y: 5.95, w: PAGE.w - 2 * PAGE.m, h: 0.5, isTextBox: true, margin: 0, align: "center", fontFace: F.body, fontSize: 13 });
+      s.addNotes("This IS Build B. Every formula is one they used yesterday — LEFT / RIGHT / MID / FIND / TEXT. The lesson: masking isn't a new skill, it's yesterday's skill aimed at a privacy problem. Do NOT let them mask customer_id — that's the analysis key you keep.");
+    },
+    (pres) => {
+      const s = K.concept(pres, "You can — but should you?  India’s DPDP Act 2023", "Governance");
+      K.cardsRow(s, {
+        y: 1.95, h: 3.3, items: [
+          { badge: "1", color: P.teal, head: "Consent", body: "Collect personal data only with clear, informed consent for a stated purpose.", bodyAlign: "center", headSize: 16 },
+          { badge: "2", color: P.orange, head: "Purpose limit", body: "Data taken to deliver food can’t be silently reused — e.g. sold to a partner.", bodyAlign: "center", headSize: 16 },
+          { badge: "3", color: P.coral, head: "Minimisation", body: "Don’t keep what you don’t need. Why store a full DOB when an age band works?", bodyAlign: "center", headSize: 16 },
+          { badge: "4", color: P.navy, head: "Data fiduciary", body: "The company is accountable for protecting it — a breach carries real penalties.", bodyAlign: "center", headSize: 16 },
+        ],
+      });
       s.addText([
-        { text: "One of today's 10 questions is unethical to answer with this data as-is.  ", options: { color: P.white } },
-        { text: "Find it.", options: { bold: true, color: P.gold } },
-      ], { x: PAGE.m, y: 5.15, w: PAGE.w - 2 * PAGE.m, h: 0.85, isTextBox: true, margin: 0, shape: "roundRect", rectRadius: 0.06, fill: { color: P.navy }, align: "center", valign: "middle", fontFace: F.head, fontSize: 17 });
-      s.addNotes("Mask a phone live. The 'unethical' one is usually the question that targets individuals by sensitive attribute — let them debate which.");
+        { text: "Capability ≠ permission.  ", options: { bold: true, color: P.gold } },
+        { text: "You can compute “average order value by age” — governance decides whether you should.", options: { color: P.white } },
+      ], { x: PAGE.m, y: 5.5, w: PAGE.w - 2 * PAGE.m, h: 0.85, isTextBox: true, margin: 0, shape: "roundRect", rectRadius: 0.06, fill: { color: P.navy }, align: "center", valign: "middle", fontFace: F.head, fontSize: 16 });
+      s.addNotes("FoodCo is an Indian company, so DPDP is their real law — four words they'll remember. Land 'capability ≠ permission': the whole ethics-desk role-play hangs on it.");
     },
   ],
   demo: {
-    title: "A formula vs a project", eyebrow: "Live demo · 10 min",
-    code: ['=COUNT(orders!A:A)          -- “how many orders?”  answerable NOW', '-- “who will churn?”  needs history + a model, not a formula', '', '="xxxxx" & RIGHT(C2, 4)     -- mask a phone  →  +91-xxxxx-4821'],
-    codeSize: 14,
-    tagline: "One question is a formula. The other is a project. Know which is which.",
-    notes: "Type both live. Let the COUNT answer instantly; then ask the room what 'who will churn' would actually require. Mask the phone in one formula.",
+    title: "A formula vs a project — then mask live", eyebrow: "Two live demos",
+    code: [
+      '=COUNTIFS(order_date, "yesterday")   -- "how many orders?"  → answerable NOW  (Descriptive)',
+      '-- "who will churn next month?"       → needs history + a model, not a formula  (Predictive)',
+      '',
+      '="xxxxxx"&RIGHT(D2,4)                         -- mask a phone  → xxxxxx2098',
+      '=LEFT(C2,2)&"***@"&MID(C2,FIND("@",C2)+1,50)  -- mask an email → kr***@example.com',
+    ],
+    codeSize: 12.5,
+    tagline: "One question is a formula; the other is a project. One formula turns raw PII into safe data.",
+    notes: "Demo 1 (4 lenses): type the COUNTIFS live — instant — then ask the room what 'who will churn' actually requires (history + a model). Demo 2 (mask): mask a phone with RIGHT, then an email with LEFT+MID+FIND. Say out loud: these are yesterday's functions.",
   },
   task: {
-    title: "Classify, then audit", eyebrow: "Hands-on · 2 hours",
+    title: "Classify, make safe, then decide", eyebrow: "Hands-on · most of the day",
     steps: [
-      ["Tag all 10 questions", "Descriptive / Diagnostic / Predictive / Prescriptive in business_questions.csv."],
-      ["Run a PII audit", "Flag every personal-data column in customers_pii.csv + a masking rule for each."],
-      ["Flag the unethical one", "Which question shouldn't be answered with this data as-is?"],
-      ["Three descriptive stats", "Total revenue, avg order value, order count on orders_sample.csv."],
+      ["Tag all 15 questions", "Descriptive / Diagnostic / Predictive / Prescriptive in business_questions.csv (10 core + 5 bonus)."],
+      ["Build a safe-to-share table", "A masking formula for every PII column in customers_pii.csv (LEFT/RIGHT/MID/FIND/TEXT) → safe_customers.csv. Keep customer_id."],
+      ["Three descriptive stats", "Total revenue, AOV, order count on orders_sample.csv — then: why can't these predict the future?"],
+      ["The ethics desk", "For 4 stakeholder requests decide answer / refuse / answer only masked-&-aggregated — and justify each."],
     ],
-    doneWhen: [{ text: "All 10 questions tagged, every PII column has a masking rule, and your 3 stats are computed.", options: { fontSize: 14, color: P.ink } }],
-    notes: "Float and challenge their tags — many questions sit between two types. That debate is the lesson.",
+    doneWhen: [{ text: "15 Qs tagged · safe_customers.csv fully masked (customer_id kept) · 3 stats done · audit.md records your rules + the one risky question.", options: { fontSize: 13, color: P.ink } }],
+    notes: "Float and challenge their tags — many questions sit between two types. In Build B, don't let them mask customer_id. In the ethics desk, 'refuse everything' is wrong — the skill is knowing when masked-&-aggregated makes it OK.",
   },
   folder: {
     title: "What's in Day_02_Analytics_Types_and_Ethics/",
-    tree: [["Day_02_Analytics_Types_and_Ethics/", ""], ["├── instructions.md", "read this"], ["├── data/", ""], ["│   ├── business_questions.csv", "tag these"], ["│   ├── customers_pii.csv", "audit this"], ["│   └── orders_sample.csv", "3 quick stats"]],
+    tree: [["Day_02_Analytics_Types_and_Ethics/", ""], ["├── instructions.md", "read this"], ["├── data/", ""], ["│   ├── business_questions.csv", "tag all 15"], ["│   ├── customers_pii.csv", "audit & mask"], ["│   └── orders_sample.csv", "3 quick stats"]],
   },
-  submit: { branch: "day02-yourname", folder: "Day_02_Analytics_Types_and_Ethics", commit: "Day 2: analytics types + PII audit" },
+  submit: { branch: "day02-yourname", folder: "Day_02_Analytics_Types_and_Ethics", commit: "Day 2: analytics types + PII masking audit" },
   recap: {
-    title: "You can classify questions — and spot unsafe data",
-    chips: ["descriptive → prescriptive", "a PII / governance audit", "the ethics gut-check"],
+    title: "You can classify questions — and make data safe to share",
+    chips: ["descriptive → prescriptive", "a safe-to-share masked table", "DPDP & the ethics desk"],
     tomorrow: "Day 3 — clean the messy order export with Power Query  (Module 2 begins)",
     notes: "Bridge: now we know what questions to ask; the next 4 days are about getting data clean enough to answer them in Excel.",
   },
@@ -685,7 +731,7 @@ DAYS.push({
 function buildDay(d) {
   const pres = L.newDeck();
   buildTitle(pres, d);
-  K.timelineSlide(pres, { steps: RHYTHM, note: RNOTE });
+  K.timelineSlide(pres, { steps: d.rhythm || RHYTHM, note: d.rhythmNote || RNOTE });
   K.scenarioSlide(pres, d.scenario);
   d.concepts.forEach((fn) => fn(pres));
   K.demoSlide(pres, d.demo);
@@ -736,7 +782,11 @@ function buildDay0() {
 }
 
 (async () => {
-  await buildDay0();
-  for (const d of DAYS) await buildDay(d);
+  const only = process.argv[3]; // optional single-day filter, e.g. `node build_all.js <path> 2`
+  if (!only) await buildDay0();
+  for (const d of DAYS) {
+    if (only && String(d.n) !== String(only)) continue;
+    await buildDay(d);
+  }
   console.log("ALL DONE");
 })();

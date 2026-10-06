@@ -1,62 +1,53 @@
-# 🗓️ Day 2 prep — Analytics types & data ethics: *what question is this, and what are we allowed to do with the data?*
+# 🗓️ Day 2 prep — Analytics types & data ethics (**6-hour deep version**)
 
-**Module 1 · Foundations** · Tool: Excel + a text viewer · **one 3-hour class, taught twice**
+**Module 1 · Foundations** · Tool: Excel + a text viewer · **one 6-hour class, single batch**
 
-> Two ideas today: the four analytics lenses (descriptive → diagnostic → predictive → prescriptive) and data ethics / PII. Keep it concrete — every "type" is just a *question you could ask the orders table*. The ethics half lands the moment you mask a real phone number on screen.
+> Two big ideas: the four analytics lenses (descriptive → diagnostic → predictive → prescriptive) and data ethics / PII. The 6-hour format means you don't rush — you teach it, they practise it twice, and you debate the gray areas properly.
+>
+> **Continuity hook (use it out loud):** *"Yesterday you learned `SUM`, `COUNTIF`/`SUMIFS`, `IF`, `TEXT`, `LEFT`. Today you'll reuse the exact same functions — `RIGHT`/`LEFT`/`MID`/`TEXT` to protect people's data, and `SUM`/`AVERAGE`/`COUNT` to tell the past from the future."* This makes Day 2 feel like a continuation, not a reset.
 
 ## 🌙 The night before (10 min)
-- [ ] Read [`trainer_notes.md`](trainer_notes.md) — your 10-min demo (4 lenses on one table, mask-the-phone beat) + the answer key for the 10 question tags + the ethics-audit model answer.
+- [ ] Read [`trainer_notes.md`](trainer_notes.md) — the demo scripts, the answer key for **all 15** questions, the full masking-lab solution, the DPDP context, and the ethics role-play answers.
 - [ ] Open the deck `Day_02_deck.pptx` once; click through it.
-- [ ] Have the customer file open so the PII columns (`customer_name`, `email`, `phone`, `date_of_birth`) are ready to point at.
-- [ ] Decide how you'll mask the phone number live (hide the middle digits) — that's the beat that opens the ethics discussion.
+- [ ] Have `data/customers_pii.csv` open so the PII columns (`customer_name`, `email`, `phone`, `date_of_birth`) are ready to point at.
+- [ ] Rehearse the two live formulas once: phone `="xxxxxx"&RIGHT(D2,4)` and email `=LEFT(C2,2)&"***@"&MID(C2,FIND("@",C2)+1,50)`.
 
-## 🌅 This morning — release Day 2
+## 🌅 This morning — release Day 2 + post to Classroom
 ```powershell
 tools/release-day.ps1 02
 ```
-Students run `git pull upstream main` to get `Day_02_Analytics_Types_and_Ethics/`.
+Students run `git pull upstream main` to get `Day_02_Analytics_Types_and_Ethics/`. Then in **Google Classroom → Classwork → Day 2**, post the deck (export to PDF) + a one-line "today's task" note as a Material.
 
-## ⏱️ Your 3-hour run-sheet (run this twice — morning + afternoon batch)
-
-```mermaid
-gantt
-    title Day 2 — one 3-hour class
-    dateFormat HH:mm
-    axisFormat %H:%M
-    section Demo
-    Live demo: 4 lenses + mask a phone     :00:00, 10m
-    Read the brief                         :00:10, 5m
-    section Build
-    Classify 10 questions + PII audit      :00:15, 120m
-    section Share
-    Show & tell: compare + debate           :02:15, 30m
-    section Wrap
-    Submit your PR                          :02:45, 15m
-```
+## ⏱️ Your 6-hour run-sheet (single batch, 2 breaks)
 
 | Time | Block | What you do |
 |------|-------|-------------|
-| 0:00–0:10 | **Demo** | Ask the same orders table four questions: *what happened / why / what's likely next / what should we do.* Then mask a phone number to open ethics. |
-| 0:10–0:15 | **Brief** | Students read the day's `instructions.md`. |
-| 0:15–2:15 | **Build** | They tag 10 business questions by analytics type and audit the customer data for PII. |
-| 2:15–2:45 | **Show & tell** | 2–3 students share; class debates the gray ones (is a star rating PII? is "why is Mumbai late" diagnostic or predictive?). |
-| 2:45–3:00 | **Wrap** | Reveal the key, students commit + open their Day 2 PR, preview Day 3. |
+| 0:00–0:05 | **Warm-up** | Recap yesterday's functions in one breath, then the continuity hook above. |
+| 0:05–0:25 | **Demo 1 — 4 lenses** | Ask ONE orders table four questions: *what happened / why / what's next / what to do.* Answer the descriptive one live with `=COUNTIFS(...)` (yesterday's function) — then show the predictive one **can't** be done with a formula. That contrast *is* the lesson. |
+| 0:25–1:10 | **Build A** | Students tag Q1–Q10 in `business_questions.csv` individually, then pair up and compare. |
+| 1:10–1:40 | **Debate A** | Referee the borderline ones as a class (diagnostic vs predictive). Then throw up **bonus Q11–Q15** and argue them. |
+| 1:40–1:50 | ☕ **Break** | |
+| 1:50–2:15 | **Demo 2 — the ethics flip** | Open `customers_pii.csv`. Mask a **phone** live (`RIGHT`), then an **email** (`LEFT`+`MID`+`FIND`). "We cut risk without losing the ability to match a support ticket." |
+| 2:15–2:35 | **Teach — governance** | Direct identifiers vs **quasi-identifiers** (city + DOB can re-identify); consent, purpose limitation, data minimisation. Ground it in India's **DPDP Act 2023** (FoodCo is an Indian company — this is real for them). |
+| 2:35–3:45 | **Build B** | Students build a full **"safe-to-share" masked customer table** — a masking formula for every PII column — and write `audit.md` (PII list, rule per column, the one risky question). |
+| 3:45–3:55 | ☕ **Break** | |
+| 3:55–4:40 | **Build C** | On `orders_sample.csv`: `SUM` / `AVERAGE` / `COUNT` for total revenue, AOV, order count (yesterday's functions), then the one-sentence "why can't these predict the future?" |
+| 4:40–5:25 | **Role-play — ethics desk** | Four stakeholder requests (in `trainer_notes.md`). Groups decide **answer / refuse / answer only masked-&-aggregated** and justify. Same role-play format you used for Excel yesterday. |
+| 5:25–5:55 | **Show & tell** | 3–4 students share; reveal the key; debate the gray tags and masking choices. |
+| 5:55–6:00 | **Wrap** | Commit + open the Day 2 PR; preview Day 3 (Power Query — "tomorrow the data is messy on purpose"). |
 
-## 🎬 The demo in one line
-Four questions about **one** orders table — what happened, why, what's next, what to do — then mask a phone number live to flip into ethics. Don't lecture the definitions; let the questions carry them. Full script in [`trainer_notes.md`](trainer_notes.md).
+## 🎬 The two demos in one line each
+1. **4 lenses:** four questions about one orders table — the first answerable with a formula *today*, the last needing a model — so the types define themselves.
+2. **Mask-the-phone:** one live formula turns raw PII into safe data; that single keystroke opens the entire ethics discussion.
 
-## 📤 What students submit
-A classification of 10 FoodCo business questions into the four analytics types **plus** a short PII / ethics audit of the customer data (which columns are personal, what you'd mask or restrict), as a Pull Request.
+## 📤 What students submit (as a PR)
+`business_questions_solved.csv` (all 15 tagged) + a `safe_customers.csv`/sheet (every PII column masked) + `audit.md` (PII list, masking rules, one risky question + why) + the 3 descriptive numbers.
 
 ## ⚠️ Watch-outs
-- Diagnostic vs predictive is the classic mix-up: "*why* did retention drop" (diagnostic) vs "*will* it drop next quarter" (predictive). Expect to referee this.
-- Students treat PII as "the obvious ones." Push them: `date_of_birth` and `phone` are as sensitive as a name — and a free-text review can leak identity too.
-- The mask-the-phone moment is the whole lesson. If a student says "but it's just test data," that *is* the discussion — governance habits are built on practice data.
-
-## 🏃 Running ahead? (fills a light day)
-- Add 5 more questions and have them argue the borderline ones.
-- Debate: *"Which FoodCo data would you be most uncomfortable selling to a partner, and why?"*
-- Set up Day 3: *"The data we clean tomorrow is messy on purpose — what kinds of dirt would you expect in real orders?"*
+- **Diagnostic vs predictive** is the classic mix-up: "*why* did retention drop" (diagnostic) vs "*will* it drop next quarter" (predictive). You'll referee this — that's the point.
+- Students miss that **`date_of_birth` + `city`** together re-identify someone even without a name. Push on quasi-identifiers.
+- "It's just test data" → *that is the discussion.* Governance habits are built on practice data.
+- In the masking lab, don't let them mask the **`customer_id`** — that's the analysis key you deliberately keep.
 
 ## ➡️ Tomorrow
-**Day 3 — Data cleaning with Power Query.** Module 2 (Advanced Excel) begins. Release with `tools/release-day.ps1 03`. Pre-read: `../Day_03_Data_Cleaning_PowerQuery/prep.md`.
+**Day 3 — Data cleaning with Power Query.** Module 2 (Advanced Excel) proper begins. Release with `tools/release-day.ps1 03`. Pre-read: `../Day_03_Data_Cleaning_PowerQuery/prep.md`. With 6 hours you can also fold in a core-Excel-functions recap if yesterday's block needs reinforcing.
